@@ -20,8 +20,8 @@
   .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   @media(max-width:700px){.row{grid-template-columns:1fr}}
   .list{display:flex;flex-direction:column;gap:10px}
-  img{max-width:100%;border-radius:12px}
   .pill{font-size:12px;color:var(--muted)}
+  #status{margin-left:8px;font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -32,6 +32,7 @@
       <button class="btn" id="btnLoad">Load from data.json</button>
       <button class="btn" id="btnSave">Save draft (device)</button>
       <button class="btn" id="btnPublish">Publish to GitHub</button>
+      <span id="status"></span>
     </div>
   </div>
 </header>
@@ -84,23 +85,27 @@
 const state={
   site:{store_name:'PixelLabs',owner_whatsapp:'',shipping_base:49,razorpay_key:'',logo:'logo.jpg'},
   products:[],
-  _uploads:{} // path -> File (kept for Publish)
+  _uploads:{} // path -> File
 };
 const els={
   items:qs('#items'), preview:qs('#preview'),
   repo:qs('#repo'), branch:qs('#branch'), token:qs('#token'), rootPath:qs('#rootPath'),
   store_name:qs('#store_name'), owner_whatsapp:qs('#owner_whatsapp'), shipping_base:qs('#shipping_base'),
-  razorpay_key:qs('#razorpay_key'), logo:qs('#logo'), logoUpload:qs('#logoUpload')
+  razorpay_key:qs('#razorpay_key'), logo:qs('#logo'), logoUpload:qs('#logoUpload'),
+  status:qs('#status')
 };
 function qs(s){return document.querySelector(s)}
 function uid(){return Math.floor(Math.random()*1e9)}
 function fileSafe(n){ return n.toLowerCase().replace(/[^a-z0-9._-]+/g,'-').replace(/^-+|-+$/g,''); }
 function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
+function setStatus(t){ els.status.textContent=t||''; }
 
-function saveDraft(){ localStorage.setItem('pxl_draft', JSON.stringify(state)); alert('Saved draft on this device.'); }
-function loadDraft(){ const raw=localStorage.getItem('pxl_draft'); if(raw){ Object.assign(state, JSON.parse(raw)); applyState(); } }
+function saveDraft(){ localStorage.setItem('pxl_draft', JSON.stringify({...state, _uploads:{}})); alert('Saved draft on this device.'); }
+function loadDraft(){
+  const raw=localStorage.getItem('pxl_draft');
+  if(raw){ Object.assign(state, JSON.parse(raw)); state._uploads={}; applyState(); }
+}
 function rememberCreds(){
-  // sanitize repo field if user pasted a URL
   const r=els.repo.value.trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\/?$/,'');
   els.repo.value=r;
   localStorage.setItem('pxl_creds', JSON.stringify({repo:r, branch:els.branch.value||'main', token:els.token.value, rootPath:els.rootPath.value||''}));
@@ -116,13 +121,28 @@ function forgetCreds(){ localStorage.removeItem('pxl_creds'); els.token.value=''
   els.razorpay_key.addEventListener(evt, syncSite);
   els.logo.addEventListener(evt, syncSite);
 });
-els.logoUpload.addEventListener('change', (e)=>{ const f=e.target.files[0]; if(!f) return; const path='assets/'+fileSafe(f.name); state.site.logo=path; state._uploads[path]=f; updatePreview(); });
+els.logoUpload.addEventListener('change', (e)=>{
+  const f=e.target.files[0]; if(!f) return;
+  const path='assets/'+fileSafe(f.name);
+  state.site.logo=path;
+  state._uploads[path]=f;
+  updatePreview();
+});
 
 qs('#btnAdd').addEventListener('click',()=>{ const p={id:uid(),name:'New product',price:0,stock:10,category:'',images:[]}; state.products.push(p); renderProducts(); updatePreview(); });
 qs('#btnSave').addEventListener('click', saveDraft);
 qs('#btnRemember').addEventListener('click', rememberCreds);
 qs('#btnForget').addEventListener('click', forgetCreds);
-qs('#btnLoad').addEventListener('click', async()=>{ try{ const r=await fetch('data.json?cache='+Date.now()); const d=await r.json(); Object.assign(state, d); applyState(); alert('Loaded from data.json'); }catch(e){ alert('Could not load data.json'); } });
+qs('#btnLoad').addEventListener('click', async()=>{
+  try{
+    const r=await fetch('data.json?cache='+Date.now());
+    const d=await r.json();
+    Object.assign(state, d);
+    state._uploads={}; // reset: JSON cannot carry Files
+    applyState();
+    alert('Loaded from data.json');
+  }catch(e){ alert('Could not load data.json'); }
+});
 qs('#btnPublish').addEventListener('click', publish);
 
 function syncSite(){ state.site.store_name=els.store_name.value; state.site.owner_whatsapp=els.owner_whatsapp.value; state.site.shipping_base=Number(els.shipping_base.value||0); state.site.razorpay_key=els.razorpay_key.value; state.site.logo=els.logo.value; updatePreview(); }
@@ -171,7 +191,7 @@ function renderProducts(){
       });
     });
 
-    // Click actions (dup/del + OK to append images)
+    // Actions
     wrap.addEventListener('click', async (ev)=>{
       const act=ev.target.dataset.act; if(!act) return;
       if(act==='del'){ state.products=state.products.filter(x=>x!==p); renderProducts(); updatePreview(); return; }
@@ -184,12 +204,12 @@ function renderProducts(){
         const newPaths = [];
         for(const f of list){
           const path = 'assets/' + fileSafe(f.name);
-          state._uploads[path] = f; // keep file for Publish
+          state._uploads[path] = f; // keep for Publish
           newPaths.push(path);
         }
         p.images = unique([...(p.images||[]), ...newPaths]);
         imagesTxt.value = (p.images||[]).join(', ');
-        fileInput.value = ''; // clear so user can pick more and press OK again
+        fileInput.value = ''; // clear; user can choose more then OK again
         updatePreview();
       }
     });
@@ -228,52 +248,65 @@ function b64Bytes(u8){ let s=''; for(let i=0;i<u8.length;i++) s+=String.fromChar
 
 async function gatherFiles(){
   const files=[];
-  // data.json
-  files.push({path:'data.json', content:b64(JSON.stringify(state,null,2))});
-  // pending uploads gathered via OK button
-  for(const [path,file] of Object.entries(state._uploads)){
-    const arr = new Uint8Array(await file.arrayBuffer());
-    files.push({path, content:b64Bytes(arr)});
+  // always push data.json
+  files.push({path:'data.json', content:b64(JSON.stringify({...state, _uploads:undefined}, null, 2))});
+  // add only real File objects (skip anything restored from drafts)
+  for(const [path, file] of Object.entries(state._uploads || {})){
+    if(file && typeof file.arrayBuffer === 'function'){
+      const arr = new Uint8Array(await file.arrayBuffer());
+      files.push({path, content:b64Bytes(arr)});
+    }
   }
   return files;
 }
 
 async function publish(){
-  // sanitize repo like Remember does
-  const repoFull=els.repo.value.trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\/?$/,'');
-  const branch=(els.branch.value||'main').trim();
-  const token=els.token.value.trim();
-  const root=els.rootPath.value.trim();
-  if(!repoFull||!token){ alert('Set Repo and Token first.'); return; }
-  const [owner,repo]=repoFull.split('/');
-  const base=`https://api.github.com/repos/${owner}/${repo}/contents/`;
+  try{
+    setStatus('Publishing…');
+    const repoFull=els.repo.value.trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\/?$/,'');
+    const branch=(els.branch.value||'main').trim();
+    const token=els.token.value.trim();
+    const root=els.rootPath.value.trim();
+    if(!repoFull||!token){ alert('Set Repo and Token first.'); setStatus(''); return; }
+    const [owner,repo]=repoFull.split('/');
+    const base=`https://api.github.com/repos/${owner}/${repo}/contents/`;
 
-  const files=await gatherFiles();
-  for(const f of files){
-    const path=(root? (root.replace(/\/?$/,'/')+f.path):f.path);
-    let sha;
-    try{
-      const meta=await fetch(base+encodeURIComponent(path)+`?ref=${encodeURIComponent(branch)}`,{headers:{Authorization:`Bearer ${token}`}}); 
-      if(meta.status===200){ const j=await meta.json(); sha=j.sha; }
-    }catch(e){}
-    const res=await fetch(base+encodeURIComponent(path),{
-      method:'PUT',
-      headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
-      body:JSON.stringify({message:`chore: update ${f.path} via inline editor`, content:f.content, branch, sha})
-    });
-    if(!res.ok){
-      const t=await res.text();
-      alert('Failed on '+path+'\n'+t);
-      throw new Error(t);
+    const files=await gatherFiles();
+    for(const f of files){
+      const path=(root? (root.replace(/\/?$/,'/')+f.path):f.path);
+      let sha;
+      try{
+        const meta=await fetch(base+encodeURIComponent(path)+`?ref=${encodeURIComponent(branch)}`,{headers:{Authorization:`Bearer ${token}`}});
+        if(meta.status===200){ const j=await meta.json(); sha=j.sha; }
+      }catch(_){}
+      const res=await fetch(base+encodeURIComponent(path),{
+        method:'PUT',
+        headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json'},
+        body:JSON.stringify({message:`chore: update ${f.path} via inline editor`, content:f.content, branch, sha})
+      });
+      if(!res.ok){
+        const t=await res.text();
+        alert('Failed on '+path+'\n'+t);
+        setStatus('Publish failed');
+        return;
+      }
     }
+    state._uploads = {}; // clear pending files after success
+    alert('Published! Site will update after GitHub Pages refreshes.');
+    setStatus('Published ✓');
+  }catch(e){
+    console.error(e);
+    setStatus('Publish failed');
   }
-  alert('Published! Site will update after GitHub Pages refreshes.');
 }
 
 function esc(s){return (s||'').replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
 
 loadCreds(); loadDraft();
-fetch('data.json').then(r=>r.ok?r.json():null).then(d=>{ if(d){ Object.assign(state,d); applyState(); } else { applyState(); } });
+fetch('data.json').then(r=>r.ok?r.json():null).then(d=>{
+  if(d){ Object.assign(state,d); state._uploads={}; applyState(); }
+  else { applyState(); }
+});
 </script>
 </body>
 </html>
