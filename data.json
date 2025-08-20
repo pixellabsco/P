@@ -72,7 +72,18 @@
       "price": 2222,
       "stock": 10,
       "category": "clothes ",
-      "images": []
+      "images": [
+        "assets/whatsapp-image-2025-08-18-at-16.53.24_e630e59d.jpg",
+        "assets/whatsapp-image-2025-08-18-at-16.53.25_2c423782.jpg",
+        "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg",
+        "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg"
+      ]
     }
-  ]
+  ],
+  "_uploads": {
+    "assets/whatsapp-image-2025-08-18-at-16.53.24_e630e59d.jpg": {},
+    "assets/whatsapp-image-2025-08-18-at-16.53.25_2c423782.jpg": {},
+    "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg": {},
+    "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg": {}
+  }
 }
