@@ -14,9 +14,9 @@
       "stock": 99,
       "category": "Watch",
       "images": [
-        "WhatsApp Image 2025-08-18 at 16.53.23_f677067d.jpg",
-        "WhatsApp Image 2025-08-18 at 16.53.24_9a088815.jpg",
-        "WhatsApp Image 2025-08-18 at 16.53.24_e630e59d.jpg"
+        "assets/WhatsApp Image 2025-08-18 at 16.53.23_f677067d.jpg",
+        "assets/WhatsApp Image 2025-08-18 at 16.53.24_9a088815.jpg",
+        "assets/WhatsApp Image 2025-08-18 at 16.53.24_e630e59d.jpg"
       ]
     },
     {
@@ -26,8 +26,8 @@
       "stock": 34,
       "category": "clothe",
       "images": [
-        "WhatsApp Image 2025-08-18 at 16.54.23_b271f1fc.jpg",
-        "WhatsApp Image 2025-08-18 at 16.54.24_85748ece.jpg"
+        "assets/WhatsApp Image 2025-08-18 at 16.54.23_b271f1fc.jpg",
+        "assets/WhatsApp Image 2025-08-18 at 16.54.24_85748ece.jpg"
       ]
     },
     {
@@ -37,8 +37,8 @@
       "stock": 50,
       "category": "Electronics",
       "images": [
-        "https://images.unsplash.com/photo-1517433456452-f9633a875f6f?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1517935706615-2717063c2225?q=80&w=1600&auto=format&fit=crop"
+        "assets/https://images.unsplash.com/photo-1517433456452-f9633a875f6f?q=80&w=1600&auto=format&fit=crop",
+        "assets/https://images.unsplash.com/photo-1517935706615-2717063c2225?q=80&w=1600&auto=format&fit=crop"
       ]
     },
     {
