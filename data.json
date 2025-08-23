@@ -9,13 +9,14 @@
   "products": [
     {
       "id": 1,
-      "name": "Rolex Men's Skeleton Automatic – Custom Design Edition! ",
-      "price": 14999,
-      "stock": 99,
-      "category": "Watch",
+      "name": "Rolex men shirts ",
+      "price": 200,
+      "stock": 10000,
+      "category": "clothes ",
       "images": [
-        "assets/whatsapp-image-2025-08-18-at-16.53.24_e630e59d.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.53.25_2c423782.jpg"
+        "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg",
+        "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg",
+        "assets/whatsapp-image-2025-08-18-at-16.53.24_9a088815.jpg"
       ]
     },
     {
@@ -75,13 +76,5 @@
         "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg"
       ]
     }
-  ],
-  "_uploads": {
-    "assets/whatsapp-image-2025-08-18-at-16.53.24_e630e59d.jpg": {},
-    "assets/whatsapp-image-2025-08-18-at-16.53.25_2c423782.jpg": {},
-    "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg": {},
-    "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg": {},
-    "assets/whatsapp-image-2025-08-18-at-16.53.23_f677067d.jpg": {},
-    "assets/whatsapp-image-2025-08-18-at-16.53.24_9a088815.jpg": {}
-  }
+  ]
 }
