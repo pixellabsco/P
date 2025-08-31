@@ -9,77 +9,14 @@
   "products": [
     {
       "id": 1,
-      "name": "Rolex men shirts ",
-      "price": 200,
-      "stock": null,
+      "name": " Rolex DateJust",
+      "price": 2535,
+      "stock": 0,
       "category": "watch",
       "images": [
-        "assets/whatsapp-image-2025-08-28-at-23.37.28_857948ed.jpg",
-        "assets/whatsapp-video-2025-08-28-at-11.54.12-pm.mp4"
+        "assets/whatsapp-image-2025-08-28-at-23.37.28_857948ed.jpg"
       ],
       "description": "Premium cotton shirt with a clean, tailored fit—pairs well with luxury timepieces. Breathable fabric, easy-care finish."
-    },
-    {
-      "id": 2,
-      "name": "shirt pant combination",
-      "price": 1299,
-      "stock": 34,
-      "category": "clothe",
-      "images": [
-        "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg"
-      ],
-      "description": "Co-ordinated shirt & pant set for a ready-to-wear look. Comfortable daily fabric with a neat, versatile style."
-    },
-    {
-      "id": 3,
-      "name": "Smart Watch",
-      "price": 1999,
-      "stock": 50,
-      "category": "Electronics",
-      "images": [
-        "assets/whatsapp-image-2025-08-18-at-16.53.23_f677067d.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.53.24_9a088815.jpg"
-      ],
-      "description": "Smartwatch with notifications, health tracking, and multiple sport modes. Long battery life and smooth, responsive UI."
-    },
-    {
-      "id": 146314985,
-      "name": "New product my watch ,this is my best watch,",
-      "price": 140000,
-      "stock": 10000,
-      "category": "watch ",
-      "images": [
-        "assets/whatsapp-image-2025-08-18-at-16.53.25_2c423782.jpg"
-      ],
-      "description": "Flagship watch with premium build and precision movement. Classic design, durable glass, and comfortable strap."
-    },
-    {
-      "id": 958102100,
-      "name": "my new t shirt and pentsssss",
-      "price": 12222,
-      "stock": 10,
-      "category": "clothes ",
-      "images": [
-        "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.53.24_9a088815.jpg"
-      ],
-      "description": "Soft tee and pants combo for everyday comfort. Easy-care fabric with a relaxed fit suitable for all-day wear."
-    },
-    {
-      "id": 470148682,
-      "name": "my first product",
-      "price": 2222,
-      "stock": 10,
-      "category": "clothes ",
-      "images": [
-        "assets/whatsapp-image-2025-08-18-at-16.53.24_e630e59d.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.53.25_2c423782.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.54.23_b271f1fc.jpg",
-        "assets/whatsapp-image-2025-08-18-at-16.54.24_85748ece.jpg"
-      ],
-      "description": "Everyday apparel with a clean silhouette and comfortable hand-feel. Designed for easy styling and repeat wear."
     }
   ]
 }
