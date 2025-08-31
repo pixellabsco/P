@@ -17,6 +17,45 @@
         "assets/whatsapp-image-2025-08-28-at-23.37.28_857948ed.jpg"
       ],
       "description": "Premium cotton shirt with a clean, tailored fit—pairs well with luxury timepieces. Breathable fabric, easy-care finish."
+    },
+    {
+      "id": 771071105,
+      "name": " Rolex GMT Master 2 Ever Rose Edition 2023",
+      "price": 2795,
+      "stock": 0,
+      "category": "watch",
+      "images": [
+        "assets/whatsapp-image-2025-08-31-at-23.37.22_f96042b9.jpg",
+        "assets/1-image-2025-08-31-at-23.33.25_45184b98.jpg",
+        "assets/2whatsapp-image-2025-08-31-at-23.33.26_b2a73c61.jpg",
+        "assets/3whatsapp-image-2025-08-31-at-23.33.26_8bae5613.jpg"
+      ]
+    },
+    {
+      "id": 26142300,
+      "name": " Patek Philippe for Men",
+      "price": 3120,
+      "stock": 0,
+      "category": "watch",
+      "images": [
+        "assets/p1whatsapp-image-2025-08-31-at-23.42.08_ec5b07b3.jpg",
+        "assets/p2whatsapp-image-2025-08-31-at-23.42.07_d39325cb.jpg",
+        "assets/p3whatsapp-image-2025-08-31-at-23.42.07_edc9dc28.jpg",
+        "assets/p4whatsapp-image-2025-08-31-at-23.45.57_637c03d7.jpg"
+      ]
+    },
+    {
+      "id": 843495974,
+      "name": "Hublot Big Bang",
+      "price": 1365,
+      "stock": 0,
+      "category": "watch",
+      "images": [
+        "assets/whatsapp-image-2025-08-31-at-11.48.02-pm.jpeg",
+        "assets/whatsapp-image-2025-08-31-at-11.48.33-pm.jpeg",
+        "assets/whatsapp-image-2025-08-31-at-11.48.56-pm.jpeg",
+        "assets/whatsapp-image-2025-08-31-at-11.50.42-pm.jpeg"
+      ]
     }
   ]
 }
