@@ -101,13 +101,21 @@ function unique(arr){ return Array.from(new Set(arr.filter(Boolean))); }
 function setStatus(t){ els.status.textContent=t||''; }
 function isVideo(u=''){ return /\.(mp4|webm|ogg)(\?|#|$)/i.test(u); }
 
-/* Local description storage (device-only) */
 const DESC_MAP_KEY='productDescriptions';
 function getDescMap(){ try{ return JSON.parse(localStorage.getItem(DESC_MAP_KEY)||'{}')||{}; }catch(_){ return {}; } }
 function setDescMap(m){ try{ localStorage.setItem(DESC_MAP_KEY, JSON.stringify(m||{})); }catch(_){ } }
 function readDesc(id){ const m=getDescMap(); const v=m[id]; return (typeof v==='string')?v:''; }
 function writeDesc(id, txt){ const m=getDescMap(); m[id]=txt||''; setDescMap(m); }
 function clearDesc(id){ const m=getDescMap(); delete m[id]; setDescMap(m); }
+
+/* NEW: on publish, merge device descriptions into state -> data.json */
+function mergeDescriptionsIntoState(){
+  const m = getDescMap();
+  (state.products || []).forEach(p=>{
+    const t = (m && typeof m[p.id] === 'string') ? m[p.id].trim() : '';
+    if(t) p.description = t; // ensure it lands in data.json
+  });
+}
 
 function saveDraft(){ localStorage.setItem('pxl_draft', JSON.stringify({...state, _uploads:{}})); alert('Saved draft on this device.'); }
 function loadDraft(){ const raw=localStorage.getItem('pxl_draft'); if(raw){ Object.assign(state, JSON.parse(raw)); state._uploads={}; applyState(); } }
@@ -120,7 +128,6 @@ function rememberCreds(){
 function loadCreds(){ const raw=localStorage.getItem('pxl_creds'); if(raw){ const c=JSON.parse(raw); els.repo.value=c.repo||''; els.branch.value=c.branch||'main'; els.token.value=c.token||''; els.rootPath.value=c.rootPath||''; } }
 function forgetCreds(){ localStorage.removeItem('pxl_creds'); els.token.value=''; alert('Cleared saved settings.'); }
 
-/* Keep store fields in sync */
 ['input','change'].forEach(evt=>{
   els.store_name.addEventListener(evt, syncSite);
   els.owner_whatsapp.addEventListener(evt, syncSite);
@@ -159,14 +166,13 @@ function renderProducts(){
   state.products.forEach(p=>{
     const wrap=document.createElement('div'); wrap.className='card';
     const savedDesc = readDesc(p.id);
-
     wrap.innerHTML=`
       <div class="row">
         <div><label>Name<input data-k="name" value="${esc(p.name)}"/></label></div>
         <div><label>Price (₹)<input data-k="price" value="${p.price}" inputmode="decimal"/></label></div>
       </div>
       <div class="row">
-        <div><label>Category<input data-k="category" value="${esc(p.category||'')}" /></label></div>
+        <div><label>Category<input data-k="category" value="${esc(p.category||'')}"/></label></div>
         <div><label>Stock<input data-k="stock" value="${p.stock||0}" inputmode="numeric"/></label></div>
       </div>
 
@@ -180,6 +186,7 @@ function renderProducts(){
         </div>
       </div>
 
+      <!-- Media accepts images or videos -->
       <div><label>Media (images/videos, comma-separated URLs)
         <textarea data-k="imagesTxt">${esc((p.images||[]).join(', '))}</textarea>
       </label></div>
@@ -207,11 +214,8 @@ function renderProducts(){
           p.images = inp.value.split(',').map(s=>s.trim()).filter(Boolean);
         }else if(k==='price'||k==='stock'){
           p[k]=Number(inp.value||0);
-        }else if(k==='category'){
-          // Trim spaces so categories stay clean (prevents duplicates in dropdown)
-          p.category = inp.value.replace(/\s+/g, ' ').trim();
         }else if(k==='desc'){
-          // not auto-saving to storage while typing
+          // user must click "Save description" to store locally
         }else if(k!=='upload'){
           p[k]=inp.value;
         }
@@ -226,13 +230,13 @@ function renderProducts(){
       if(act==='save-desc'){
         const txt = wrap.querySelector('textarea[data-k="desc"]').value;
         writeDesc(p.id, txt);
-        setStatus('Description saved for product #'+p.id);
+        setStatus('Description saved for product #' + p.id);
         return;
       }
       if(act==='clear-desc'){
         clearDesc(p.id);
         wrap.querySelector('textarea[data-k="desc"]').value='';
-        setStatus('Using default description from data.json for #'+p.id);
+        setStatus('Using default description from data.json for #' + p.id);
         return;
       }
       if(act==='del'){ state.products=state.products.filter(x=>x!==p); renderProducts(); updatePreview(); return; }
@@ -284,7 +288,7 @@ function updatePreview(){
       ${media}
       <div class='p'>
         <div><strong>${esc(p.name)}</strong></div>
-        <div class='small'>${esc((p.category||'').trim())}</div>
+        <div class='small'>${esc(p.category||'')}</div>
         <div class='price'>₹${Number(p.price||0).toLocaleString('en-IN')}</div>
         <div class='actions'><button class='btn'>Add to cart</button><button>Buy now</button><button>View</button></div>
       </div>
@@ -294,15 +298,13 @@ function updatePreview(){
   const blob=new Blob([html],{type:'text/html'}); els.preview.src=URL.createObjectURL(blob);
 }
 
-/* === Build files to push === */
+/* Build files to push */
 function b64(str){ return btoa(unescape(encodeURIComponent(str))); }
 function b64Bytes(u8){ let s=''; for(let i=0;i<u8.length;i++) s+=String.fromCharCode(u8[i]); return btoa(s); }
 
 async function gatherFiles(){
   const files=[];
-  // always push data.json
   files.push({path:'data.json', content:b64(JSON.stringify({...state, _uploads:undefined}, null, 2))});
-  // add uploaded files
   for(const [path, file] of Object.entries(state._uploads || {})){
     if(file && typeof file.arrayBuffer === 'function'){
       const arr = new Uint8Array(await file.arrayBuffer());
@@ -322,6 +324,9 @@ async function publish(){
     if(!repoFull||!token){ alert('Set Repo and Token first.'); setStatus(''); return; }
     const [owner,repo]=repoFull.split('/');
     const base=`https://api.github.com/repos/${owner}/${repo}/contents/`;
+
+    /* NEW: inject device descriptions into state before writing data.json */
+    mergeDescriptionsIntoState();
 
     const files=await gatherFiles();
     for(const f of files){
